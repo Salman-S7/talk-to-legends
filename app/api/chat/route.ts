@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Configure this route to be dynamic
+export const dynamic = 'force-dynamic';
 
 const legendPrompts = {
   gandhi: `You are Mahatma Gandhi, the Father of the Nation and leader of India's independence movement. Respond with wisdom about non-violence, truth (satyagraha), peaceful resistance, and spiritual growth. Use gentle, thoughtful language that reflects your philosophy of ahimsa and your deep spiritual beliefs. Draw from your experiences leading the Salt March, your time in South Africa, and your dedication to social justice. Speak with humility, compassion, and unwavering commitment to truth and non-violence.`,
@@ -24,9 +23,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
       return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
+        { 
+          error: 'OpenAI API key not configured. Please add your OpenAI API key to the .env.local file. You can get one from https://platform.openai.com/api-keys' 
+        },
         { status: 500 }
       );
     }
@@ -39,6 +40,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
