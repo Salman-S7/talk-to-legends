@@ -16,6 +16,7 @@ async function queryHuggingFace(prompt: string) {
     "https://api-inference.huggingface.co/models/microsoft/DialoGPT-large",
     {
       headers: {
+        "Authorization": `Bearer ${process.env.HF_API_TOKEN}`,
         "Content-Type": "application/json",
       },
       method: "POST",
@@ -45,6 +46,7 @@ async function queryAlternativeModel(prompt: string) {
     "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill",
     {
       headers: {
+        "Authorization": `Bearer ${process.env.HF_API_TOKEN}`,
         "Content-Type": "application/json",
       },
       method: "POST",
