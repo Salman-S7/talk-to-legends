@@ -18,6 +18,7 @@ interface Message {
   content: string;
   sender: 'user' | 'legend';
   timestamp: Date;
+  isTyping?: boolean;
 }
 
 interface ChatInterfaceProps {
@@ -64,6 +65,36 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
     }
   }, [inputMessage]);
 
+  // Typing animation function
+  const typeMessage = (fullText: string, messageId: string) => {
+    return new Promise<void>((resolve) => {
+      let currentIndex = 0;
+      const typingSpeed = 30; // milliseconds per character
+      
+      const typeNextChar = () => {
+        if (currentIndex <= fullText.length) {
+          const currentText = fullText.substring(0, currentIndex);
+          
+          setMessages(prev => prev.map(msg => 
+            msg.id === messageId 
+              ? { ...msg, content: currentText, isTyping: currentIndex < fullText.length }
+              : msg
+          ));
+          
+          currentIndex++;
+          
+          if (currentIndex <= fullText.length) {
+            setTimeout(typeNextChar, typingSpeed);
+          } else {
+            resolve();
+          }
+        }
+      };
+      
+      typeNextChar();
+    });
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isTyping) return;
 
@@ -97,26 +128,39 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
 
       const data = await response.json();
       
+      // Create the message with empty content first
+      const legendMessageId = (Date.now() + 1).toString();
       const legendMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: data.response,
+        id: legendMessageId,
+        content: '',
         sender: 'legend',
-        timestamp: new Date()
+        timestamp: new Date(),
+        isTyping: true
       };
 
       setMessages(prev => [...prev, legendMessage]);
+      
+      // Start typing animation
+      await typeMessage(data.response, legendMessageId);
+      
     } catch (error) {
       console.error('Error sending message:', error);
       
       // Fallback response in case of API error
+      const fallbackMessageId = (Date.now() + 1).toString();
       const fallbackMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
+        id: fallbackMessageId,
+        content: '',
         sender: 'legend',
-        timestamp: new Date()
+        timestamp: new Date(),
+        isTyping: true
       };
 
       setMessages(prev => [...prev, fallbackMessage]);
+      
+      // Type the fallback message
+      await typeMessage("I apologize, but I'm having trouble responding right now. Please try again in a moment.", fallbackMessageId);
+      
     } finally {
       setIsTyping(false);
     }
@@ -161,14 +205,21 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
 
           const data = await response.json();
           
+          // Create new message with typing animation
+          const newMessageId = (Date.now() + 2).toString();
           const newMessage: Message = {
-            id: (Date.now() + 2).toString(),
-            content: data.response,
+            id: newMessageId,
+            content: '',
             sender: 'legend',
-            timestamp: new Date()
+            timestamp: new Date(),
+            isTyping: true
           };
 
           setMessages(prev => [...prev, newMessage]);
+          
+          // Start typing animation
+          await typeMessage(data.response, newMessageId);
+          
         } catch (error) {
           console.error('Error regenerating response:', error);
           
@@ -265,40 +316,45 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
                       <div className="prose prose-sm max-w-none">
                         <p className="text-black dark:text-white text-sm leading-relaxed whitespace-pre-wrap mb-0">
                           {message.content}
+                          {message.isTyping && (
+                            <span className="inline-block w-2 h-4 bg-green-500 ml-1 animate-pulse"></span>
+                          )}
                         </p>
                       </div>
-                      {/* Message Actions */}
-                      <div className="flex items-center space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyMessage(message.content)}
-                          className="h-7 px-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs"
-                        >
-                          <Copy className="h-3 w-3 mr-1" />
-                          Copy
-                        </Button>
-                        {index === messages.length - 1 && (
+                      {/* Message Actions - Only show for completed messages */}
+                      {!message.isTyping && (
+                        <div className="flex items-center space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={regenerateResponse}
-                            disabled={isTyping}
-                            className="h-7 px-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs disabled:opacity-50"
+                            onClick={() => copyMessage(message.content)}
+                            className="h-7 px-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs"
                           >
-                            <RefreshCw className="h-3 w-3 mr-1" />
-                            Regenerate
+                            <Copy className="h-3 w-3 mr-1" />
+                            Copy
                           </Button>
-                        )}
-                      </div>
+                          {index === messages.length - 1 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={regenerateResponse}
+                              disabled={isTyping}
+                              className="h-7 px-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs disabled:opacity-50"
+                            >
+                              <RefreshCw className="h-3 w-3 mr-1" />
+                              Regenerate
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
               </div>
             ))}
             
-            {/* Typing Indicator */}
-            {isTyping && (
+            {/* Typing Indicator - Only show when waiting for API response */}
+            {isTyping && !messages.some(msg => msg.isTyping) && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <span className="text-white text-sm font-semibold">{legend.name.charAt(0)}</span>
