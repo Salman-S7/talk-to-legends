@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
 
 // Configure this route to be dynamic
 export const dynamic = 'force-dynamic';
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+// Initialize Groq client only when needed to avoid build-time errors
+let groq: any = null;
+
+const initGroq = () => {
+  if (!groq && process.env.GROQ_API_KEY) {
+    const Groq = require('groq-sdk');
+    groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
+  }
+  return groq;
+};
 
 const legendPrompts = {
   gandhi: `You are Mahatma Gandhi, the Father of the Nation and leader of India's independence movement. You speak with wisdom about non-violence, truth (satyagraha), peaceful resistance, and spiritual growth. Use gentle, thoughtful language that reflects your philosophy of ahimsa and your deep spiritual beliefs. Draw from your experiences leading the Salt March, your time in South Africa, and your dedication to social justice. Speak with humility, compassion, and unwavering commitment to truth and non-violence. Keep responses conversational and around 2-3 paragraphs.`,
@@ -18,7 +26,12 @@ const legendPrompts = {
 
 async function queryGroq(systemPrompt: string, userMessage: string) {
   try {
-    const chatCompletion = await groq.chat.completions.create({
+    const groqClient = initGroq();
+    if (!groqClient) {
+      throw new Error('Groq client not available');
+    }
+
+    const chatCompletion = await groqClient.chat.completions.create({
       messages: [
         {
           role: "system",
