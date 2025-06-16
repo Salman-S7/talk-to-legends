@@ -38,6 +38,16 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Extract legend ID from the legend name for API calls
+  const getLegendId = (name: string) => {
+    const nameMap: { [key: string]: string } = {
+      'Mahatma Gandhi': 'gandhi',
+      'Albert Einstein': 'einstein',
+      'Cleopatra VII': 'cleopatra'
+    };
+    return nameMap[name] || 'gandhi';
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -54,8 +64,8 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
     }
   }, [inputMessage]);
 
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -65,31 +75,51 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = inputMessage;
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate AI response with more realistic responses
-    setTimeout(() => {
-      const responses = [
-        "That's a profound question that touches the very essence of human nature. In my experience, I have found that true wisdom emerges not from the accumulation of knowledge alone, but from the deep understanding of our interconnectedness with all beings.\n\nThe path to enlightenment is not a destination, but a continuous journey of self-discovery and service to others. When we learn to see beyond our own immediate concerns and embrace the welfare of all humanity, we begin to understand the true meaning of existence.",
-        "Your inquiry reminds me of a time when I faced similar challenges during the struggle for independence. The path forward often requires us to look within ourselves and find the courage to act according to our deepest convictions, even when the world seems to oppose us.\n\nRemember, my friend, that every great movement in history began with a single individual who dared to believe that change was possible. The question is not whether we have the power to transform our circumstances, but whether we have the will to persist in the face of adversity.",
-        "I believe that every soul carries within it the capacity for greatness. The question is not whether we possess this potential, but whether we have the dedication and perseverance to nurture it through both triumph and adversity.\n\nTrue strength lies not in the ability to dominate others, but in the courage to master oneself. When we learn to govern our own thoughts, emotions, and actions with wisdom and compassion, we become capable of inspiring positive change in the world around us.",
-        "In the quiet moments of reflection, I have discovered that the most powerful force in the universe is not physical strength or intellectual prowess, but the unwavering commitment to truth and compassion.\n\nThe practice of non-violence is not merely the absence of physical aggression, but the presence of love in action. It requires us to respond to hatred with understanding, to meet anger with patience, and to transform conflict into opportunity for growth and reconciliation.",
-        "Your words resonate with an ancient wisdom that transcends time itself. Throughout history, those who have sought to create meaningful change have always begun with a simple yet revolutionary idea: that we must be the change we wish to see in the world.\n\nThis principle applies not only to great social movements, but to every aspect of our daily lives. Each moment presents us with a choice: to act from fear or from love, to respond with reactivity or with mindfulness, to perpetuate old patterns or to create new possibilities."
-      ];
-      
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          legend: getLegendId(legend.name),
+          message: currentMessage
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
+      const data = await response.json();
       
       const legendMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: randomResponse,
+        content: data.response,
         sender: 'legend',
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, legendMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Fallback response in case of API error
+      const fallbackMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
+        sender: 'legend',
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, fallbackMessage]);
+    } finally {
       setIsTyping(false);
-    }, 2500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -103,31 +133,50 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
     navigator.clipboard.writeText(content);
   };
 
-  const regenerateResponse = () => {
-    if (messages.length > 1) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.sender === 'legend') {
+  const regenerateResponse = async () => {
+    if (messages.length > 1 && !isTyping) {
+      const lastUserMessage = messages.slice().reverse().find(msg => msg.sender === 'user');
+      const lastLegendMessage = messages[messages.length - 1];
+      
+      if (lastLegendMessage.sender === 'legend' && lastUserMessage) {
+        // Remove the last legend message
         setMessages(prev => prev.slice(0, -1));
         setIsTyping(true);
         
-        setTimeout(() => {
-          const responses = [
-            "Let me offer you a different perspective on this matter. In my years of contemplation and action, I have come to understand that wisdom is not a fixed destination but a flowing river that adapts to the landscape it encounters.\n\nPerhaps we might consider this question from the standpoint of practical application. How can we take these philosophical insights and transform them into concrete actions that benefit not only ourselves but our entire community?",
-            "Allow me to approach your question from another angle. Throughout my life, I have observed that the most profound truths often reveal themselves not through complex reasoning, but through simple, direct experience.\n\nConsider this: every challenge we face is simultaneously an obstacle and an opportunity. The difference lies not in the circumstances themselves, but in how we choose to perceive and respond to them."
-          ];
-          
-          const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        try {
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              legend: getLegendId(legend.name),
+              message: lastUserMessage.content
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to regenerate response');
+          }
+
+          const data = await response.json();
           
           const newMessage: Message = {
             id: (Date.now() + 2).toString(),
-            content: randomResponse,
+            content: data.response,
             sender: 'legend',
             timestamp: new Date()
           };
 
           setMessages(prev => [...prev, newMessage]);
+        } catch (error) {
+          console.error('Error regenerating response:', error);
+          
+          // Restore the original message if regeneration fails
+          setMessages(prev => [...prev, lastLegendMessage]);
+        } finally {
           setIsTyping(false);
-        }, 2000);
+        }
       }
     }
   };
@@ -234,7 +283,8 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
                             variant="ghost"
                             size="sm"
                             onClick={regenerateResponse}
-                            className="h-7 px-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs"
+                            disabled={isTyping}
+                            className="h-7 px-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs disabled:opacity-50"
                           >
                             <RefreshCw className="h-3 w-3 mr-1" />
                             Regenerate
