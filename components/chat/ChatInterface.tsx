@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, ArrowLeft, MoreVertical, Copy, RefreshCw, ArrowUp, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import VoicePlayer from './VoicePlayer';
 
 interface Legend {
   name: string;
@@ -36,6 +37,7 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -255,6 +257,9 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
             </div>
             <div>
               <h2 className="text-black dark:text-white font-medium text-sm">{legend.name}</h2>
+              {playingMessageId && (
+                <p className="text-xs text-green-600 dark:text-green-400">Speaking...</p>
+              )}
             </div>
           </div>
         </div>
@@ -284,6 +289,9 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
               </h1>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm">
                 {legend.title} • Ask anything about life, wisdom, or philosophy
+              </p>
+              <p className="text-neutral-500 dark:text-neutral-500 text-xs mt-2">
+                🎙️ Click "Listen" to hear their voice
               </p>
             </div>
           )}
@@ -322,8 +330,15 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
                         </p>
                       </div>
                       {/* Message Actions - Only show for completed messages */}
-                      {!message.isTyping && (
+                      {!message.isTyping && message.content && (
                         <div className="flex items-center space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <VoicePlayer
+                            text={message.content}
+                            legend={getLegendId(legend.name)}
+                            isVisible={true}
+                            onPlayStart={() => setPlayingMessageId(message.id)}
+                            onPlayEnd={() => setPlayingMessageId(null)}
+                          />
                           <Button
                             variant="ghost"
                             size="sm"
