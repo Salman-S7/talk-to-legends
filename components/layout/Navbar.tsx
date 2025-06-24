@@ -33,6 +33,9 @@ export default function Navbar() {
             <Link href="/legends" className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium">
               Legends
             </Link>
+            <Link href="/pricing" className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium">
+              Pricing
+            </Link>
             <Link href="/about" className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium">
               About
             </Link>
@@ -75,6 +78,13 @@ export default function Navbar() {
                 onClick={toggleMenu}
               >
                 Legends
+              </Link>
+              <Link 
+                href="/pricing" 
+                className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium px-4 py-2"
+                onClick={toggleMenu}
+              >
+                Pricing
               </Link>
               <Link 
                 href="/about" 

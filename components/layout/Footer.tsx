@@ -76,13 +76,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
-                  About Us
+                <Link href="/pricing" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                  Pricing
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
-                  How It Works
+                <Link href="/about" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                  About Us
                 </Link>
               </li>
             </ul>
@@ -108,7 +108,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                <Link href="/legends" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
                   View All
                 </Link>
               </li>

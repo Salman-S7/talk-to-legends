@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { MessageCircle, Users, Zap, ArrowRight, Play, Star, Globe, Brain, Clock, Shield, Award, BookOpen, Target, Lightbulb, CheckCircle, Quote, TrendingUp, Sparkles } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import PricingSection from '@/components/home/PricingSection';
 
 export default function Home() {
   return (
@@ -28,16 +29,19 @@ export default function Home() {
           <div className="absolute top-[2200px] -left-32 w-88 h-88 bg-green-400/20 rounded-full blur-3xl"></div>
           <div className="absolute top-[2400px] right-1/4 w-72 h-72 bg-green-600/15 rounded-full blur-3xl"></div>
           
-          {/* Testimonials Section Gradients */}
+          {/* Pricing Section Gradients */}
           <div className="absolute top-[2800px] left-10 w-64 h-64 bg-green-500/10 rounded-full blur-3xl"></div>
           <div className="absolute top-[3000px] -right-20 w-80 h-80 bg-green-400/15 rounded-full blur-3xl"></div>
           
-          {/* Stats Section Gradients */}
+          {/* Testimonials Section Gradients */}
           <div className="absolute top-[3400px] left-1/3 w-60 h-60 bg-green-600/20 rounded-full blur-3xl"></div>
           
-          {/* CTA Section Gradients */}
+          {/* Stats Section Gradients */}
           <div className="absolute top-[3800px] -left-40 w-96 h-96 bg-green-500/15 rounded-full blur-3xl"></div>
           <div className="absolute top-[4000px] right-20 w-72 h-72 bg-green-400/10 rounded-full blur-3xl"></div>
+          
+          {/* CTA Section Gradients */}
+          <div className="absolute top-[4400px] left-1/4 w-80 h-80 bg-green-600/15 rounded-full blur-3xl"></div>
         </div>
 
         {/* Hero Section */}
@@ -323,6 +327,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Pricing Section */}
+        <PricingSection />
 
         {/* Testimonials Section */}
         <section className="relative py-24 px-4 sm:px-6 lg:px-8 z-10">
