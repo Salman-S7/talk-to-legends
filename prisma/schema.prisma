@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-openssl-1.1.x", "linux-openssl-3.0.x"]
 }
 
 datasource db {
@@ -50,7 +49,6 @@ model User {
   location      String?
   bio           String?
   plan          Plan      @default(FREE)
-  password      String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
