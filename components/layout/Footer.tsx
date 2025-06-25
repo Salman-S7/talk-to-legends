@@ -117,26 +117,26 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="text-black dark:text-white font-semibold mb-6">Support</h4>
+            <h4 className="text-black dark:text-white font-semibold mb-6">Account</h4>
             <ul className="space-y-3">
+              <li>
+                <Link href="/auth/login" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                  Sign In
+                </Link>
+              </li>
+              <li>
+                <Link href="/auth/signup" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                  Sign Up
+                </Link>
+              </li>
+              <li>
+                <Link href="/profile" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                  Profile
+                </Link>
+              </li>
               <li>
                 <Link href="#" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
                   Help Center
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
-                  Contact Us
                 </Link>
               </li>
             </ul>
