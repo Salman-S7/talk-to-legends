@@ -1,9 +1,8 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 import { ThemeProvider } from '@/components/ui/theme-provider';
+import SessionProvider from '@/components/providers/SessionProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,18 +19,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="min-h-screen bg-white dark:bg-neutral-900 text-black dark:text-white transition-colors duration-500">
-            <main className="min-h-screen">
-              {children}
-            </main>
-          </div>
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="min-h-screen bg-white dark:bg-neutral-900 text-black dark:text-white transition-colors duration-500">
+              <main className="min-h-screen">
+                {children}
+              </main>
+            </div>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

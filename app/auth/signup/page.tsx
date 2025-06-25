@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { Eye, EyeOff, MessageCircle, Mail, Lock, User, ArrowRight, Github, Chrome, Check } from 'lucide-react';
+import { Eye, EyeOff, MessageCircle, Mail, Lock, User, ArrowRight, Github, Chrome } from 'lucide-react';
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +22,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -50,20 +53,52 @@ export default function SignupPage() {
         return;
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, accept any valid form data
-      if (formData.firstName && formData.lastName && formData.email && formData.password) {
-        // Redirect to legends page on successful signup
-        window.location.href = '/legends';
+      // Register user
+      const registerResponse = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const registerData = await registerResponse.json();
+
+      if (!registerResponse.ok) {
+        setError(registerData.error || 'Registration failed');
+        return;
+      }
+
+      // Auto-login after successful registration
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Registration successful, but login failed. Please try logging in manually.');
       } else {
-        setError('Please fill in all required fields');
+        router.push('/legends');
+        router.refresh();
       }
     } catch (err) {
-      setError('Signup failed. Please try again.');
+      setError('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: string) => {
+    try {
+      await signIn(provider, { callbackUrl: '/legends' });
+    } catch (err) {
+      setError(`${provider} signup failed. Please try again.`);
     }
   };
 
@@ -277,6 +312,8 @@ export default function SignupPage() {
             {/* Social Login */}
             <div className="mt-6 grid grid-cols-2 gap-3">
               <Button
+                type="button"
+                onClick={() => handleSocialLogin('github')}
                 variant="outline"
                 className="w-full border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700"
               >
@@ -284,6 +321,8 @@ export default function SignupPage() {
                 GitHub
               </Button>
               <Button
+                type="button"
+                onClick={() => handleSocialLogin('google')}
                 variant="outline"
                 className="w-full border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700"
               >

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn, getSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +15,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,20 +23,32 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, accept any email/password
-      if (email && password) {
-        // Redirect to legends page on successful login
-        window.location.href = '/legends';
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Invalid email or password');
       } else {
-        setError('Please enter both email and password');
+        // Refresh the session and redirect
+        await getSession();
+        router.push('/legends');
+        router.refresh();
       }
     } catch (err) {
       setError('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: string) => {
+    try {
+      await signIn(provider, { callbackUrl: '/legends' });
+    } catch (err) {
+      setError(`${provider} login failed. Please try again.`);
     }
   };
 
@@ -168,6 +183,8 @@ export default function LoginPage() {
             {/* Social Login */}
             <div className="mt-6 grid grid-cols-2 gap-3">
               <Button
+                type="button"
+                onClick={() => handleSocialLogin('github')}
                 variant="outline"
                 className="w-full border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700"
               >
@@ -175,6 +192,8 @@ export default function LoginPage() {
                 GitHub
               </Button>
               <Button
+                type="button"
+                onClick={() => handleSocialLogin('google')}
                 variant="outline"
                 className="w-full border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700"
               >
