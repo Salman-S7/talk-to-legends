@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 // Configure this route to be dynamic
 export const dynamic = 'force-dynamic';
@@ -97,7 +100,16 @@ async function queryHuggingFaceFallback(prompt: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { legend, message } = await request.json();
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const { legend, message, conversationId } = await request.json();
 
     if (!legend || !message) {
       return NextResponse.json(
@@ -114,6 +126,49 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    let conversation;
+
+    // Get or create conversation
+    if (conversationId) {
+      conversation = await prisma.conversation.findFirst({
+        where: {
+          id: conversationId,
+          userId: session.user.id
+        }
+      });
+
+      if (!conversation) {
+        return NextResponse.json(
+          { error: 'Conversation not found' },
+          { status: 404 }
+        );
+      }
+    } else {
+      // Create new conversation
+      const legendNames = {
+        gandhi: 'Mahatma Gandhi',
+        einstein: 'Albert Einstein',
+        cleopatra: 'Cleopatra VII'
+      };
+
+      conversation = await prisma.conversation.create({
+        data: {
+          userId: session.user.id,
+          legendId: legend,
+          title: `Chat with ${legendNames[legend as keyof typeof legendNames] || legend}`,
+        }
+      });
+    }
+
+    // Save user message
+    await prisma.message.create({
+      data: {
+        conversationId: conversation.id,
+        content: message,
+        sender: 'USER'
+      }
+    });
 
     let response;
     
@@ -179,7 +234,25 @@ export async function POST(request: NextRequest) {
       response = fallbackResponses[legend as keyof typeof fallbackResponses] || fallbackResponses.gandhi;
     }
 
-    return NextResponse.json({ response });
+    // Save legend response
+    await prisma.message.create({
+      data: {
+        conversationId: conversation.id,
+        content: response,
+        sender: 'LEGEND'
+      }
+    });
+
+    // Update conversation timestamp
+    await prisma.conversation.update({
+      where: { id: conversation.id },
+      data: { updatedAt: new Date() }
+    });
+
+    return NextResponse.json({ 
+      response,
+      conversationId: conversation.id
+    });
 
   } catch (error) {
     console.error('Chat API error:', error);
