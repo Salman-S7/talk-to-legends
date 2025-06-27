@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, MoreVertical, Copy, RefreshCw, ArrowUp, Sparkles } from 'lucide-react';
+import { Send, ArrowLeft, MoreVertical, Copy, RefreshCw, ArrowUp, Sparkles, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import VoicePlayer from './VoicePlayer';
 
@@ -27,6 +29,8 @@ interface ChatInterfaceProps {
 }
 
 export default function ChatInterface({ legend }: ChatInterfaceProps) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -38,6 +42,8 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -50,6 +56,58 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
     };
     return nameMap[name] || 'gandhi';
   };
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+  }, [status, router]);
+
+  // Load conversation history if user is authenticated
+  useEffect(() => {
+    const loadConversationHistory = async () => {
+      if (status === 'authenticated' && session?.user) {
+        setIsLoadingHistory(true);
+        try {
+          // Try to find existing conversation for this legend
+          const response = await fetch('/api/conversations');
+          if (response.ok) {
+            const data = await response.json();
+            const existingConversation = data.conversations.find(
+              (conv: any) => conv.legendId === getLegendId(legend.name)
+            );
+
+            if (existingConversation) {
+              setConversationId(existingConversation.id);
+              
+              // Load messages for this conversation
+              const messagesResponse = await fetch(`/api/conversations/${existingConversation.id}/messages`);
+              if (messagesResponse.ok) {
+                const messagesData = await messagesResponse.json();
+                const loadedMessages = messagesData.messages.map((msg: any) => ({
+                  id: msg.id,
+                  content: msg.content,
+                  sender: msg.sender.toLowerCase() as 'user' | 'legend',
+                  timestamp: new Date(msg.createdAt)
+                }));
+
+                if (loadedMessages.length > 0) {
+                  setMessages(loadedMessages);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Failed to load conversation history:', error);
+        } finally {
+          setIsLoadingHistory(false);
+        }
+      }
+    };
+
+    loadConversationHistory();
+  }, [status, session, legend.name]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -98,7 +156,7 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isTyping) return;
+    if (!inputMessage.trim() || isTyping || status !== 'authenticated') return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -120,7 +178,8 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
         },
         body: JSON.stringify({
           legend: getLegendId(legend.name),
-          message: currentMessage
+          message: currentMessage,
+          conversationId: conversationId
         }),
       });
 
@@ -129,6 +188,11 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
       }
 
       const data = await response.json();
+      
+      // Set conversation ID if this is the first message
+      if (!conversationId && data.conversationId) {
+        setConversationId(data.conversationId);
+      }
       
       // Create the message with empty content first
       const legendMessageId = (Date.now() + 1).toString();
@@ -180,7 +244,7 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
   };
 
   const regenerateResponse = async () => {
-    if (messages.length > 1 && !isTyping) {
+    if (messages.length > 1 && !isTyping && status === 'authenticated') {
       const lastUserMessage = messages.slice().reverse().find(msg => msg.sender === 'user');
       const lastLegendMessage = messages[messages.length - 1];
       
@@ -197,7 +261,8 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
             },
             body: JSON.stringify({
               legend: getLegendId(legend.name),
-              message: lastUserMessage.content
+              message: lastUserMessage.content,
+              conversationId: conversationId
             }),
           });
 
@@ -240,6 +305,47 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
     "What advice would you give to young people today?",
     "How do you overcome fear and self-doubt?"
   ];
+
+  // Show loading state while checking authentication
+  if (status === 'loading' || isLoadingHistory) {
+    return (
+      <div className="flex flex-col h-screen bg-white dark:bg-neutral-900 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-green-600 mb-4" />
+        <p className="text-neutral-600 dark:text-neutral-400">Loading conversation...</p>
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (status === 'unauthenticated') {
+    return (
+      <div className="flex flex-col h-screen bg-white dark:bg-neutral-900 items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-white text-2xl font-semibold">{legend.name.charAt(0)}</span>
+          </div>
+          <h1 className="text-2xl font-bold text-black dark:text-white mb-4">
+            Sign in to chat with {legend.name}
+          </h1>
+          <p className="text-neutral-600 dark:text-neutral-400 mb-8">
+            Create an account or sign in to start your conversation with history's greatest minds.
+          </p>
+          <div className="space-y-3">
+            <Link href="/auth/login">
+              <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/auth/signup">
+              <Button variant="outline" className="w-full border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 font-semibold py-3 rounded-lg">
+                Create Account
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-neutral-900 overflow-hidden">
