@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { getPlanLimits } from '@/lib/plans';
 
 // Configure this route to be dynamic
 export const dynamic = 'force-dynamic';
@@ -74,42 +70,6 @@ async function generateSpeech(text: string, voiceConfig: any) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    // Get user's plan to check voice generation access
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { plan: true }
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    const userPlan = user.plan || 'FREE';
-    const limits = getPlanLimits(userPlan);
-
-    // Check if user has access to voice generation
-    if (!limits.voiceGeneration) {
-      return NextResponse.json(
-        { 
-          error: 'Voice generation requires Pro plan',
-          upgrade: true 
-        },
-        { status: 403 }
-      );
-    }
-
     const { legend, text } = await request.json();
 
     if (!legend || !text) {

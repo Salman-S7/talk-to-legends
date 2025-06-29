@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, MoreVertical, Copy, RefreshCw, ArrowUp, Sparkles, Loader2, AlertTriangle, Crown } from 'lucide-react';
+import { Send, ArrowLeft, MoreVertical, Copy, RefreshCw, ArrowUp, Sparkles, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import VoicePlayer from './VoicePlayer';
 
@@ -28,13 +28,6 @@ interface ChatInterfaceProps {
   legend: Legend;
 }
 
-interface UsageData {
-  plan: string;
-  limits: any;
-  usage: any;
-  remaining: any;
-}
-
 export default function ChatInterface({ legend }: ChatInterfaceProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -51,8 +44,6 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
   const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [usageData, setUsageData] = useState<UsageData | null>(null);
-  const [limitError, setLimitError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -73,19 +64,12 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
     }
   }, [status, router]);
 
-  // Load usage data and conversation history
+  // Load conversation history if user is authenticated
   useEffect(() => {
-    const loadData = async () => {
+    const loadConversationHistory = async () => {
       if (status === 'authenticated' && session?.user) {
         setIsLoadingHistory(true);
         try {
-          // Load usage data
-          const usageResponse = await fetch('/api/user/usage');
-          if (usageResponse.ok) {
-            const usage = await usageResponse.json();
-            setUsageData(usage);
-          }
-
           // Try to find existing conversation for this legend
           const response = await fetch('/api/conversations');
           if (response.ok) {
@@ -115,14 +99,14 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
             }
           }
         } catch (error) {
-          console.error('Failed to load data:', error);
+          console.error('Failed to load conversation history:', error);
         } finally {
           setIsLoadingHistory(false);
         }
       }
     };
 
-    loadData();
+    loadConversationHistory();
   }, [status, session, legend.name]);
 
   const scrollToBottom = () => {
@@ -174,9 +158,6 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isTyping || status !== 'authenticated') return;
 
-    // Clear any previous limit errors
-    setLimitError(null);
-
     const userMessage: Message = {
       id: Date.now().toString(),
       content: inputMessage,
@@ -202,19 +183,11 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        if (response.status === 429) {
-          // Handle rate limiting
-          setLimitError(data.message);
-          // Remove the user message since it wasn't processed
-          setMessages(prev => prev.slice(0, -1));
-          setInputMessage(currentMessage); // Restore the message
-          return;
-        }
-        throw new Error(data.error || 'Failed to get response');
+        throw new Error('Failed to get response');
       }
+
+      const data = await response.json();
       
       // Set conversation ID if this is the first message
       if (!conversationId && data.conversationId) {
@@ -235,13 +208,6 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
       
       // Start typing animation
       await typeMessage(data.response, legendMessageId);
-
-      // Refresh usage data after successful message
-      const usageResponse = await fetch('/api/user/usage');
-      if (usageResponse.ok) {
-        const usage = await usageResponse.json();
-        setUsageData(usage);
-      }
       
     } catch (error) {
       console.error('Error sending message:', error);
@@ -404,62 +370,10 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
           </div>
         </div>
         
-        <div className="flex items-center space-x-2">
-          {/* Usage indicator for free users */}
-          {usageData && usageData.plan === 'FREE' && (
-            <div className="text-xs text-neutral-500 dark:text-neutral-400 text-right">
-              <div>
-                {usageData.remaining.messagesRemaining >= 0 
-                  ? `${usageData.remaining.messagesRemaining} messages left`
-                  : 'Unlimited messages'
-                }
-              </div>
-              <div>
-                {usageData.remaining.conversationsRemaining >= 0 
-                  ? `${usageData.remaining.conversationsRemaining} conversations left`
-                  : 'Unlimited conversations'
-                }
-              </div>
-            </div>
-          )}
-          
-          <Button variant="ghost" size="sm" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button variant="ghost" size="sm" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
       </div>
-
-      {/* Limit Error Banner */}
-      {limitError && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 p-4">
-          <div className="flex items-center justify-between max-w-3xl mx-auto">
-            <div className="flex items-center space-x-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-              <div>
-                <p className="text-amber-800 dark:text-amber-200 font-medium text-sm">
-                  {limitError}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Link href="/pricing">
-                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-                  <Crown className="h-4 w-4 mr-1" />
-                  Upgrade
-                </Button>
-              </Link>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setLimitError(null)}
-                className="text-amber-600 dark:text-amber-400"
-              >
-                ×
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Messages Area - Custom Scrollbar Hidden */}
       <div className="flex-1 overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -482,25 +396,9 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
               <p className="text-neutral-600 dark:text-neutral-400 text-sm">
                 {legend.title} • Ask anything about life, wisdom, or philosophy
               </p>
-              {usageData && usageData.limits.voiceGeneration && (
-                <p className="text-neutral-500 dark:text-neutral-500 text-xs mt-2">
-                  🎙️ Click "Listen" to hear their voice
-                </p>
-              )}
-              
-              {/* Plan status for free users */}
-              {usageData && usageData.plan === 'FREE' && (
-                <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                  <p className="text-green-700 dark:text-green-300 text-sm">
-                    <strong>Free Plan:</strong> {usageData.remaining.messagesRemaining} messages and {usageData.remaining.conversationsRemaining} conversations remaining today
-                  </p>
-                  <Link href="/pricing">
-                    <Button size="sm" variant="outline" className="mt-2 border-green-300 dark:border-green-600 text-green-700 dark:text-green-300">
-                      Upgrade for unlimited access
-                    </Button>
-                  </Link>
-                </div>
-              )}
+              <p className="text-neutral-500 dark:text-neutral-500 text-xs mt-2">
+                🎙️ Click "Listen" to hear their voice
+              </p>
             </div>
           )}
 
@@ -540,15 +438,13 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
                       {/* Message Actions - Only show for completed messages */}
                       {!message.isTyping && message.content && (
                         <div className="flex items-center space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {usageData && usageData.limits.voiceGeneration && (
-                            <VoicePlayer
-                              text={message.content}
-                              legend={getLegendId(legend.name)}
-                              isVisible={true}
-                              onPlayStart={() => setPlayingMessageId(message.id)}
-                              onPlayEnd={() => setPlayingMessageId(null)}
-                            />
-                          )}
+                          <VoicePlayer
+                            text={message.content}
+                            legend={getLegendId(legend.name)}
+                            isVisible={true}
+                            onPlayStart={() => setPlayingMessageId(message.id)}
+                            onPlayEnd={() => setPlayingMessageId(null)}
+                          />
                           <Button
                             variant="ghost"
                             size="sm"
@@ -634,11 +530,11 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
               placeholder={`Message ${legend.name.split(' ')[0]}...`}
               className="w-full resize-none border border-neutral-300 dark:border-neutral-600 rounded-xl px-4 py-3 pr-12 bg-white dark:bg-neutral-800 text-black dark:text-white placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm leading-relaxed min-h-[44px] max-h-[200px]"
               rows={1}
-              disabled={isTyping || !!limitError}
+              disabled={isTyping}
             />
             <Button
               onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || isTyping || !!limitError}
+              disabled={!inputMessage.trim() || isTyping}
               size="sm"
               className="absolute right-2 bottom-2 h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
