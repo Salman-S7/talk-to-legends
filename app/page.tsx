@@ -116,7 +116,7 @@ export default function Home() {
               title="Built with Bolt.new"
             >
               <img
-                src="/bolt-logo.png"
+                src="https://drive.google.com/drive/folders/1iNALInxyPJl7IHP5iywUKqsdumCrWIA0"
                 alt="Bolt.new"
                 className="w-full h-full object-contain p-2 animate-[spin_8s_linear_infinite] group-hover:animate-[spin_1s_linear_infinite]"
               />
