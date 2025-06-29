@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Check, Star, Zap, Crown, MessageCircle, Volume2, Clock, Users, Shield, Award } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import UpgradeButton from '@/components/pricing/UpgradeButton';
 
 const plans = [
   {
@@ -26,7 +27,8 @@ const plans = [
     buttonText: 'Get Started Free',
     buttonVariant: 'outline' as const,
     popular: false,
-    icon: MessageCircle
+    icon: MessageCircle,
+    planId: null
   },
   {
     name: 'Pro',
@@ -47,7 +49,8 @@ const plans = [
     buttonText: 'Start Pro Trial',
     buttonVariant: 'default' as const,
     popular: true,
-    icon: Zap
+    icon: Zap,
+    planId: 'PRO' as const
   },
   {
     name: 'Premium',
@@ -68,7 +71,8 @@ const plans = [
     buttonText: 'Go Premium',
     buttonVariant: 'outline' as const,
     popular: false,
-    icon: Crown
+    icon: Crown,
+    planId: 'PREMIUM' as const
   }
 ];
 
@@ -172,8 +176,9 @@ export default function PricingPage() {
                     ))}
                   </div>
 
-                  <Link href="/legends">
-                    <Button
+                  {plan.planId ? (
+                    <UpgradeButton
+                      plan={plan.planId}
                       variant={plan.buttonVariant}
                       className={`w-full py-3 font-semibold rounded-lg transition-all duration-300 ${
                         plan.popular
@@ -182,8 +187,17 @@ export default function PricingPage() {
                       }`}
                     >
                       {plan.buttonText}
-                    </Button>
-                  </Link>
+                    </UpgradeButton>
+                  ) : (
+                    <Link href="/legends">
+                      <Button
+                        variant={plan.buttonVariant}
+                        className="w-full py-3 font-semibold rounded-lg transition-all duration-300"
+                      >
+                        {plan.buttonText}
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               );
             })}
@@ -309,11 +323,12 @@ export default function PricingPage() {
               Join thousands of curious minds exploring wisdom from history's greatest figures.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/legends">
-                <Button className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg shadow-green-500/25">
-                  Start Free Trial
-                </Button>
-              </Link>
+              <UpgradeButton
+                plan="PRO"
+                className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg shadow-green-500/25"
+              >
+                Start Free Trial
+              </UpgradeButton>
               <Link href="/about">
                 <Button variant="outline" className="px-8 py-3 border-green-300 dark:border-green-600 text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 font-semibold rounded-lg transition-all duration-300">
                   Learn More

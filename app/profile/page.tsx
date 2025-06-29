@@ -1,30 +1,101 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { User, Mail, Calendar, MapPin, Edit2, Save, X, MessageCircle, Clock, Star } from 'lucide-react';
+import ManageSubscriptionButton from '@/components/pricing/ManageSubscriptionButton';
+import UpgradeButton from '@/components/pricing/UpgradeButton';
+import { User, Mail, Calendar, MapPin, Edit2, Save, X, MessageCircle, Clock, Star, Crown, Zap } from 'lucide-react';
 
 export default function ProfilePage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    location: 'New York, NY',
-    joinDate: 'January 2024',
-    bio: 'History enthusiast passionate about learning from the greatest minds of the past.'
+    firstName: '',
+    lastName: '',
+    email: '',
+    location: '',
+    joinDate: '',
+    bio: '',
+    plan: 'FREE'
   });
 
   const [editData, setEditData] = useState(userData);
 
-  const handleSave = () => {
-    setUserData(editData);
-    setIsEditing(false);
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+  }, [status, router]);
+
+  // Load user data
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (status === 'authenticated' && session?.user) {
+        try {
+          const response = await fetch('/api/user/profile');
+          if (response.ok) {
+            const data = await response.json();
+            const user = data.user;
+            
+            const formattedData = {
+              firstName: user.firstName || '',
+              lastName: user.lastName || '',
+              email: user.email || '',
+              location: user.location || '',
+              joinDate: new Date(user.createdAt).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long' 
+              }),
+              bio: user.bio || '',
+              plan: user.plan || 'FREE'
+            };
+            
+            setUserData(formattedData);
+            setEditData(formattedData);
+          }
+        } catch (error) {
+          console.error('Failed to load user data:', error);
+        }
+      }
+    };
+
+    loadUserData();
+  }, [status, session]);
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: editData.firstName,
+          lastName: editData.lastName,
+          location: editData.location,
+          bio: editData.bio,
+        }),
+      });
+
+      if (response.ok) {
+        setUserData(editData);
+        setIsEditing(false);
+      } else {
+        alert('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Profile update error:', error);
+      alert('Failed to update profile');
+    }
   };
 
   const handleCancel = () => {
@@ -45,6 +116,47 @@ export default function ProfilePage() {
     { legend: 'Cleopatra VII', topic: 'Ancient Egyptian Politics', date: '3 days ago' }
   ];
 
+  const getPlanIcon = (plan: string) => {
+    switch (plan) {
+      case 'PRO':
+        return <Zap className="h-6 w-6 text-blue-600 dark:text-blue-400" />;
+      case 'PREMIUM':
+        return <Crown className="h-6 w-6 text-purple-600 dark:text-purple-400" />;
+      default:
+        return <Star className="h-6 w-6 text-green-600 dark:text-green-400" />;
+    }
+  };
+
+  const getPlanColor = (plan: string) => {
+    switch (plan) {
+      case 'PRO':
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300';
+      case 'PREMIUM':
+        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300';
+      default:
+        return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+    }
+  };
+
+  if (status === 'loading') {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-white dark:bg-neutral-900 pt-24 pb-20 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-neutral-600 dark:text-neutral-400">Loading profile...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (status === 'unauthenticated') {
+    return null; // Will redirect in useEffect
+  }
+
   return (
     <>
       <Navbar />
@@ -54,7 +166,7 @@ export default function ProfilePage() {
           <div className="text-center mb-12">
             <div className="w-24 h-24 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-3xl font-bold text-white">
-                {userData.firstName[0]}{userData.lastName[0]}
+                {userData.firstName?.[0] || 'U'}{userData.lastName?.[0] || ''}
               </span>
             </div>
             <h1 className="text-3xl font-bold text-black dark:text-white mb-2">
@@ -160,11 +272,14 @@ export default function ProfilePage() {
                         value={editData.location}
                         onChange={(e) => setEditData({ ...editData, location: e.target.value })}
                         className="mt-2 bg-white dark:bg-neutral-700 border-neutral-300 dark:border-neutral-600"
+                        placeholder="Enter your location"
                       />
                     ) : (
                       <div className="mt-2 flex items-center">
                         <MapPin className="h-4 w-4 text-neutral-400 mr-2" />
-                        <span className="text-neutral-600 dark:text-neutral-300">{userData.location}</span>
+                        <span className="text-neutral-600 dark:text-neutral-300">
+                          {userData.location || 'Not specified'}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -180,9 +295,12 @@ export default function ProfilePage() {
                         onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
                         rows={3}
                         className="mt-2 w-full px-3 py-2 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md text-black dark:text-white resize-none"
+                        placeholder="Tell us about yourself..."
                       />
                     ) : (
-                      <p className="mt-2 text-neutral-600 dark:text-neutral-300">{userData.bio}</p>
+                      <p className="mt-2 text-neutral-600 dark:text-neutral-300">
+                        {userData.bio || 'No bio added yet.'}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -216,6 +334,51 @@ export default function ProfilePage() {
 
             {/* Stats Sidebar */}
             <div className="space-y-6">
+              {/* Subscription Info */}
+              <Card className="p-6 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
+                <h3 className="text-lg font-semibold text-black dark:text-white mb-4">
+                  Subscription
+                </h3>
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                    {getPlanIcon(userData.plan)}
+                  </div>
+                  <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mb-2 ${getPlanColor(userData.plan)}`}>
+                    {userData.plan} Plan
+                  </div>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+                    {userData.plan === 'FREE' && 'Limited conversations and features'}
+                    {userData.plan === 'PRO' && 'Unlimited conversations with voice generation'}
+                    {userData.plan === 'PREMIUM' && 'Everything in Pro plus custom legends and API access'}
+                  </p>
+                  
+                  {userData.plan === 'FREE' ? (
+                    <div className="space-y-2">
+                      <UpgradeButton
+                        plan="PRO"
+                        size="sm"
+                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        Upgrade to Pro
+                      </UpgradeButton>
+                      <UpgradeButton
+                        plan="PREMIUM"
+                        variant="outline"
+                        size="sm"
+                        className="w-full border-neutral-300 dark:border-neutral-600"
+                      >
+                        Go Premium
+                      </UpgradeButton>
+                    </div>
+                  ) : (
+                    <ManageSubscriptionButton
+                      size="sm"
+                      className="w-full border-neutral-300 dark:border-neutral-600"
+                    />
+                  )}
+                </div>
+              </Card>
+
               {/* Conversation Stats */}
               <Card className="p-6 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                 <h3 className="text-lg font-semibold text-black dark:text-white mb-4">
@@ -250,25 +413,6 @@ export default function ProfilePage() {
                     </div>
                     <span className="font-semibold text-black dark:text-white">{conversationStats.mostTalkedTo}</span>
                   </div>
-                </div>
-              </Card>
-
-              {/* Subscription Info */}
-              <Card className="p-6 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
-                <h3 className="text-lg font-semibold text-black dark:text-white mb-4">
-                  Subscription
-                </h3>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Star className="h-6 w-6 text-green-600 dark:text-green-400" />
-                  </div>
-                  <p className="font-semibold text-black dark:text-white mb-1">Pro Plan</p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
-                    Unlimited conversations with all legends
-                  </p>
-                  <Button variant="outline" size="sm" className="w-full border-neutral-300 dark:border-neutral-600">
-                    Manage Subscription
-                  </Button>
                 </div>
               </Card>
             </div>
