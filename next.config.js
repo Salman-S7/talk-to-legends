@@ -8,7 +8,8 @@ const nextConfig = {
     domains: [
       'upload.wikimedia.org',
       'res.cloudinary.com',
-      'images.pexels.com'
+      'images.pexels.com',
+      'drive.google.com'
     ],
     remotePatterns: [
       {
@@ -28,6 +29,12 @@ const nextConfig = {
         hostname: 'images.pexels.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol : "https",
+        hostname : "drive.google.com",
+        port : '',
+        pathname : "/**"
       }
     ]
   },
