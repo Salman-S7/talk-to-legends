@@ -112,7 +112,7 @@ export default function Home() {
               href="https://bolt.new/"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-12 h-12 bg-white dark:bg-neutral-800 rounded-full shadow-lg border border-neutral-200 dark:border-neutral-700 hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+              className="block w-16 h-16 bg-white dark:bg-neutral-800 rounded-full shadow-lg border border-neutral-200 dark:border-neutral-700 hover:shadow-xl transition-all duration-300 hover:scale-110 group"
               title="Built with Bolt.new"
             >
               <img
