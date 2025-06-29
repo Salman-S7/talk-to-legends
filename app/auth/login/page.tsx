@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { Eye, EyeOff, MessageCircle, Mail, Lock, ArrowRight, Github, Chrome } from 'lucide-react';
+import { Eye, EyeOff, MessageCircle, Mail, Lock, ArrowRight, Chrome } from 'lucide-react';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -44,11 +44,11 @@ export default function LoginPage() {
     }
   };
 
-  const handleSocialLogin = async (provider: string) => {
+  const handleGoogleLogin = async () => {
     try {
-      await signIn(provider, { callbackUrl: '/legends' });
+      await signIn('google', { callbackUrl: '/legends' });
     } catch (err) {
-      setError(`${provider} login failed. Please try again.`);
+      setError('Google login failed. Please try again.');
     }
   };
 
@@ -180,25 +180,16 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Social Login */}
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            {/* Google Login */}
+            <div className="mt-6">
               <Button
                 type="button"
-                onClick={() => handleSocialLogin('github')}
-                variant="outline"
-                className="w-full border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700"
-              >
-                <Github className="h-5 w-5 mr-2" />
-                GitHub
-              </Button>
-              <Button
-                type="button"
-                onClick={() => handleSocialLogin('google')}
+                onClick={handleGoogleLogin}
                 variant="outline"
                 className="w-full border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700"
               >
                 <Chrome className="h-5 w-5 mr-2" />
-                Google
+                Continue with Google
               </Button>
             </div>
           </div>
