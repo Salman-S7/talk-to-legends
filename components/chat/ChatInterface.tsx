@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, MoreVertical, Copy, RefreshCw, ArrowUp, Sparkles, Loader2 } from 'lucide-react';
+import { Send, ArrowLeft, MoreVertical, Copy, RefreshCw, ArrowUp, Sparkles, Loader2, Volume2, Mic } from 'lucide-react';
 import Link from 'next/link';
 import VoicePlayer from './VoicePlayer';
 
@@ -375,6 +375,23 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
         </Button>
       </div>
 
+      {/* Feature Notice Banner */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-b border-blue-200 dark:border-blue-800 px-4 py-3">
+        <div className="flex items-center justify-center space-x-2 text-sm">
+          <div className="flex items-center space-x-2">
+            <Volume2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <span className="text-blue-700 dark:text-blue-300 font-medium">Voice Chat</span>
+          </div>
+          <span className="text-neutral-500 dark:text-neutral-400">•</span>
+          <div className="flex items-center space-x-2">
+            <Mic className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            <span className="text-purple-700 dark:text-purple-300 font-medium">Audio Features</span>
+          </div>
+          <span className="text-neutral-600 dark:text-neutral-400">coming soon!</span>
+          <Sparkles className="h-4 w-4 text-amber-500" />
+        </div>
+      </div>
+
       {/* Messages Area - Custom Scrollbar Hidden */}
       <div className="flex-1 overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <style jsx>{`
@@ -397,7 +414,7 @@ export default function ChatInterface({ legend }: ChatInterfaceProps) {
                 {legend.title} • Ask anything about life, wisdom, or philosophy
               </p>
               <p className="text-neutral-500 dark:text-neutral-500 text-xs mt-2">
-                🎙️ Click "Listen" to hear their voice
+                🎙️ Voice features coming soon!
               </p>
             </div>
           )}

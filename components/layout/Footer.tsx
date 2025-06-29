@@ -164,7 +164,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
               <p className="text-neutral-600 dark:text-neutral-400 text-sm flex items-center">
-                Made with <Heart className="h-4 w-4 text-green-500 mx-2" /> for history enthusiasts
+                Built with <Heart className="h-4 w-4 text-red-500 mx-2" /> by Salman
               </p>
             </div>
             <div className="text-sm text-neutral-600 dark:text-neutral-400">
