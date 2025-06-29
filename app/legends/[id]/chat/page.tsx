@@ -4,7 +4,7 @@ const legendsData = {
   gandhi: {
     name: 'Mahatma Gandhi',
     title: 'Father of the Nation',
-    avatar: 'https://images.pexels.com/photos/8815067/pexels-photo-8815067.jpeg?auto=compress&cs=tinysrgb&w=400',
+    avatar: 'https://res.cloudinary.com/aenetworks/image/upload/c_fill,ar_2,w_3840,h_1920,g_auto/dpr_auto/f_auto/q_auto:eco/v1/mahatma-gandhi-gettyimages-102701091-2048x2048-1?_a=BAVAZGDX0',
     greeting: 'Namaste, my friend. I am here to discuss the path of truth and non-violence. How may I guide you today?'
   },
   einstein: {

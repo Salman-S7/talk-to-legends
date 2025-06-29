@@ -10,7 +10,7 @@ const legends = [
     description: 'Learn about non-violence, truth, and peaceful resistance from the leader of India\'s independence movement.',
     era: '1869-1948',
     expertise: ['Non-violence', 'Philosophy', 'Leadership', 'Social Reform'],
-    image: 'https://images.pexels.com/photos/8815067/pexels-photo-8815067.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://res.cloudinary.com/aenetworks/image/upload/c_fill,ar_2,w_3840,h_1920,g_auto/dpr_auto/f_auto/q_auto:eco/v1/mahatma-gandhi-gettyimages-102701091-2048x2048-1?_a=BAVAZGDX0',
     gradient: 'from-green-500/20 to-green-600/20'
   },
   {
