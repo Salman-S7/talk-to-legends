@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { canUserSendMessage, canUserCreateConversation } from '@/lib/usage';
 
 // Configure this route to be dynamic
 export const dynamic = 'force-dynamic';
@@ -118,6 +119,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get user's current plan
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true }
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    const userPlan = user.plan || 'FREE';
+
+    // Check if user can send a message
+    const messageCheck = await canUserSendMessage(session.user.id, userPlan);
+    if (!messageCheck.allowed) {
+      return NextResponse.json(
+        { 
+          error: 'Message limit reached',
+          message: messageCheck.reason,
+          limitType: 'message'
+        },
+        { status: 429 }
+      );
+    }
+
     const systemPrompt = legendPrompts[legend as keyof typeof legendPrompts];
     
     if (!systemPrompt) {
@@ -145,6 +174,19 @@ export async function POST(request: NextRequest) {
         );
       }
     } else {
+      // Check if user can create a new conversation
+      const conversationCheck = await canUserCreateConversation(session.user.id, userPlan);
+      if (!conversationCheck.allowed) {
+        return NextResponse.json(
+          { 
+            error: 'Conversation limit reached',
+            message: conversationCheck.reason,
+            limitType: 'conversation'
+          },
+          { status: 429 }
+        );
+      }
+
       // Create new conversation
       const legendNames = {
         gandhi: 'Mahatma Gandhi',

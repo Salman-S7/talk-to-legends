@@ -11,7 +11,8 @@ const plans = [
     period: 'forever',
     description: 'Perfect for getting started',
     features: [
-      '5 conversations per day',
+      '2 conversations per day',
+      '20 messages per day',
       'Access to 3 legends',
       'Text-based chat only',
       'Basic conversation history'
@@ -28,6 +29,7 @@ const plans = [
     description: 'Unlimited conversations with voice',
     features: [
       'Unlimited conversations',
+      'Unlimited messages',
       'Access to all 25+ legends',
       'Voice generation included',
       'Priority response time',

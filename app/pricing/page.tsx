@@ -11,7 +11,8 @@ const plans = [
     period: 'forever',
     description: 'Perfect for getting started with historical conversations',
     features: [
-      '5 conversations per day',
+      '2 conversations per day',
+      '20 messages per day',
       'Access to 3 legends',
       'Text-based chat only',
       'Basic conversation history',
@@ -34,6 +35,7 @@ const plans = [
     description: 'Unlimited conversations with enhanced features',
     features: [
       'Unlimited conversations',
+      'Unlimited messages',
       'Access to all 25+ legends',
       'Voice generation included',
       'Priority response time',
@@ -206,7 +208,13 @@ export default function PricingPage() {
                 <tbody className="text-sm">
                   <tr className="border-b border-neutral-100 dark:border-neutral-800">
                     <td className="py-4 text-neutral-700 dark:text-neutral-300">Daily Conversations</td>
-                    <td className="text-center py-4 text-neutral-600 dark:text-neutral-400">5</td>
+                    <td className="text-center py-4 text-neutral-600 dark:text-neutral-400">2</td>
+                    <td className="text-center py-4 text-green-600 dark:text-green-400">Unlimited</td>
+                    <td className="text-center py-4 text-green-600 dark:text-green-400">Unlimited</td>
+                  </tr>
+                  <tr className="border-b border-neutral-100 dark:border-neutral-800">
+                    <td className="py-4 text-neutral-700 dark:text-neutral-300">Daily Messages</td>
+                    <td className="text-center py-4 text-neutral-600 dark:text-neutral-400">20</td>
                     <td className="text-center py-4 text-green-600 dark:text-green-400">Unlimited</td>
                     <td className="text-center py-4 text-green-600 dark:text-green-400">Unlimited</td>
                   </tr>
