@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { MessageCircle, Github, Twitter, Linkedin, Heart, Mail, Globe, ArrowRight, Shield, Award, Plus } from 'lucide-react';
+import { MessageCircle, Github, Twitter, Linkedin, Heart, Mail, Globe, ArrowRight, Shield, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Footer() {
@@ -76,8 +76,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/request-legend" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200 flex items-center">
-                  <Plus className="h-3 w-3 mr-1" />
+                <Link href="/request-legend" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
                   Request Legend
                 </Link>
               </li>

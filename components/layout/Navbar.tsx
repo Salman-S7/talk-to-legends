@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { Menu, X, MessageCircle, User, LogOut, Settings, History, Plus } from 'lucide-react';
+import { Menu, X, MessageCircle, User, LogOut, Settings, History } from 'lucide-react';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,10 +53,6 @@ export default function Navbar() {
             <Link href="/legends" className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium">
               Legends
             </Link>
-            <Link href="/request-legend" className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium flex items-center">
-              <Plus className="h-4 w-4 mr-1" />
-              Request Legend
-            </Link>
             <Link href="/pricing" className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium">
               Pricing
             </Link>
@@ -102,10 +98,6 @@ export default function Navbar() {
                     <Link href="/conversations" className="flex items-center px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700">
                       <History className="h-4 w-4 mr-2" />
                       Conversations
-                    </Link>
-                    <Link href="/request-legend" className="flex items-center px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Request Legend
                     </Link>
                     <Link href="/settings" className="flex items-center px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700">
                       <Settings className="h-4 w-4 mr-2" />
@@ -170,14 +162,6 @@ export default function Navbar() {
                 Legends
               </Link>
               <Link 
-                href="/request-legend" 
-                className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium px-4 py-2 flex items-center"
-                onClick={toggleMenu}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Request Legend
-              </Link>
-              <Link 
                 href="/pricing" 
                 className="text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200 font-medium px-4 py-2"
                 onClick={toggleMenu}
@@ -214,10 +198,6 @@ export default function Navbar() {
                     <Link href="/conversations" className="flex items-center px-2 py-2 text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white">
                       <History className="h-4 w-4 mr-2" />
                       Conversations
-                    </Link>
-                    <Link href="/request-legend" className="flex items-center px-2 py-2 text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Request Legend
                     </Link>
                     <Link href="/settings" className="flex items-center px-2 py-2 text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white">
                       <Settings className="h-4 w-4 mr-2" />
