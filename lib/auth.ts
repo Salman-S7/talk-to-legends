@@ -47,9 +47,9 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user.id,
           email: user.email,
-          name: user.name,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          name: user.name || undefined, // Convert null to undefined for NextAuth compatibility
+          firstName: user.firstName || undefined,
+          lastName: user.lastName || undefined,
           plan: user.plan,
         };
       }
@@ -84,7 +84,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.sub!;
         session.user.plan = token.plan as string;
         session.user.firstName = token.firstName as string;
