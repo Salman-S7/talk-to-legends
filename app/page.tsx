@@ -109,7 +109,7 @@ export default function Home() {
           </div>
 
           {/* Bolt.new Logo - Bottom Right */}
-          <div className="fixed bottom-8 right-8 z-50">
+          <div className="fixed bottom-8 right-8 z-[999999]">
             <a
               href="https://bolt.new/"
               target="_blank"
