@@ -9,7 +9,7 @@ const nextConfig = {
       'upload.wikimedia.org',
       'res.cloudinary.com',
       'images.pexels.com',
-      'drive.google.com'
+      'raw.githubusercontent.com'
     ],
     remotePatterns: [
       {
@@ -31,10 +31,10 @@ const nextConfig = {
         pathname: '/**',
       },
       {
-        protocol : "https",
-        hostname : "drive.google.com",
-        port : '',
-        pathname : "/**"
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+        port: '',
+        pathname: '/**',
       }
     ]
   },

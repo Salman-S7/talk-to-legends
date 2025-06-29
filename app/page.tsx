@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { MessageCircle, Users, Zap, ArrowRight, Play, Star, Globe, Brain, Clock, Shield, Award, BookOpen, Target, Lightbulb, CheckCircle, Quote, TrendingUp, Sparkles } from 'lucide-react';
@@ -116,7 +118,7 @@ export default function Home() {
               title="Built with Bolt.new"
             >
               <img
-                src="https://drive.google.com/drive/folders/1iNALInxyPJl7IHP5iywUKqsdumCrWIA0"
+                src="https://raw.githubusercontent.com/kickiniteasy/bolt-hackathon-badge/main/src/public/bolt-badge/black_circle_360x360/black_circle_360x360.png"
                 alt="Bolt.new"
                 className="w-full h-full object-contain p-2 animate-[spin_8s_linear_infinite] group-hover:animate-[spin_1s_linear_infinite]"
               />
