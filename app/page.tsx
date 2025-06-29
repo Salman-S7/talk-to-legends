@@ -118,10 +118,7 @@ export default function Home() {
               <img
                 src="/bolt-logo.png"
                 alt="Bolt.new"
-                className="w-full h-full object-contain p-2 animate-spin-slow group-hover:animate-spin"
-                style={{
-                  animation: 'spin 8s linear infinite',
-                }}
+                className="w-full h-full object-contain p-2 animate-[spin_8s_linear_infinite] group-hover:animate-[spin_1s_linear_infinite]"
               />
             </a>
           </div>
@@ -484,18 +481,6 @@ export default function Home() {
         </section>
       </div>
       <Footer />
-
-      {/* Custom CSS for slow spin animation */}
-      <style jsx>{`
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </>
   );
 }
