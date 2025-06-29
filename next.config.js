@@ -9,6 +9,26 @@ const nextConfig = {
       'upload.wikimedia.org',
       'res.cloudinary.com',
       'images.pexels.com'
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+        port: '',
+        pathname: '/wikipedia/commons/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+        port: '',
+        pathname: '/**',
+      }
     ]
   },
   experimental: {

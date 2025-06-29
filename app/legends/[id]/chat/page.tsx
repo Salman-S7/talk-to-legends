@@ -4,19 +4,19 @@ const legendsData = {
   gandhi: {
     name: 'Mahatma Gandhi',
     title: 'Father of the Nation',
-    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg/400px-Mahatma-Gandhi%2C_studio%2C_1931.jpg',
+    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg/300px-Mahatma-Gandhi%2C_studio%2C_1931.jpg',
     greeting: 'Namaste, my friend. I am here to discuss the path of truth and non-violence. How may I guide you today?'
   },
   einstein: {
     name: 'Albert Einstein',
     title: 'Theoretical Physicist',
-    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Einstein_1921_by_F_Schmutzer_-_restoration.jpg/400px-Einstein_1921_by_F_Schmutzer_-_restoration.jpg',
+    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Einstein_1921_by_F_Schmutzer_-_restoration.jpg/300px-Einstein_1921_by_F_Schmutzer_-_restoration.jpg',
     greeting: 'Hello! I am delighted to explore the wonders of the universe with you. What scientific mysteries shall we unravel together?'
   },
   cleopatra: {
     name: 'Cleopatra VII',
     title: 'Last Pharaoh of Egypt',
-    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Kleopatra-VII.-Altes-Museum-Berlin1.jpg/400px-Kleopatra-VII.-Altes-Museum-Berlin1.jpg',
+    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Kleopatra-VII.-Altes-Museum-Berlin1.jpg/300px-Kleopatra-VII.-Altes-Museum-Berlin1.jpg',
     greeting: 'Greetings, esteemed visitor. I am Cleopatra, ruler of Egypt. Let us discuss the art of leadership and the wisdom of the ancients.'
   }
 };
