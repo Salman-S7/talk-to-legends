@@ -3,7 +3,14 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: { unoptimized: true },
+  images: { 
+    unoptimized: true,
+    domains: [
+      'upload.wikimedia.org',
+      'res.cloudinary.com',
+      'images.pexels.com'
+    ]
+  },
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'prisma']
   },

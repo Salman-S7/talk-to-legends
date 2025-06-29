@@ -10,7 +10,7 @@ const legends = [
     description: 'Learn about non-violence, truth, and peaceful resistance from the leader of India\'s independence movement.',
     era: '1869-1948',
     expertise: ['Non-violence', 'Philosophy', 'Leadership', 'Social Reform'],
-    image: 'https://res.cloudinary.com/aenetworks/image/upload/c_fill,ar_2,w_3840,h_1920,g_auto/dpr_auto/f_auto/q_auto:eco/v1/mahatma-gandhi-gettyimages-102701091-2048x2048-1?_a=BAVAZGDX0',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg/800px-Mahatma-Gandhi%2C_studio%2C_1931.jpg',
     gradient: 'from-green-500/20 to-green-600/20'
   },
   {
@@ -20,7 +20,7 @@ const legends = [
     description: 'Discover the mysteries of the universe through conversations about relativity, quantum mechanics, and scientific curiosity.',
     era: '1879-1955',
     expertise: ['Physics', 'Mathematics', 'Philosophy', 'Innovation'],
-    image: 'https://images.pexels.com/photos/8847434/pexels-photo-8847434.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Einstein_1921_by_F_Schmutzer_-_restoration.jpg/800px-Einstein_1921_by_F_Schmutzer_-_restoration.jpg',
     gradient: 'from-neutral-500/20 to-neutral-700/20'
   },
   {
@@ -30,7 +30,7 @@ const legends = [
     description: 'Explore ancient wisdom, leadership, and the art of diplomacy with one of history\'s most powerful rulers.',
     era: '69-30 BCE',
     expertise: ['Leadership', 'Diplomacy', 'Ancient Wisdom', 'Strategy'],
-    image: 'https://images.pexels.com/photos/8960459/pexels-photo-8960459.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Kleopatra-VII.-Altes-Museum-Berlin1.jpg/800px-Kleopatra-VII.-Altes-Museum-Berlin1.jpg',
     gradient: 'from-green-600/20 to-green-800/20'
   }
 ];
