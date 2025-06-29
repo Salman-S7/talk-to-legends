@@ -53,9 +53,11 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  conversations Conversation[]
+  accounts         Account[]
+  sessions         Session[]
+  conversations    Conversation[]
+  legendRequests   LegendRequest[]
+  legendRequestVotes LegendRequestVote[]
 }
 
 model VerificationToken {
@@ -94,6 +96,44 @@ model Message {
   @@index([conversationId])
 }
 
+// Legend Request System
+model LegendRequest {
+  id                String              @id @default(cuid())
+  userId            String
+  legendName        String
+  timeEra           String?
+  profession        String?
+  nationality       String?
+  whyImportant      String              @db.Text
+  specificQuestions String?             @db.Text
+  additionalInfo    String?             @db.Text
+  status            LegendRequestStatus @default(PENDING)
+  votes             Int                 @default(0)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  legendRequestVotes LegendRequestVote[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([votes])
+}
+
+model LegendRequestVote {
+  id              String   @id @default(cuid())
+  legendRequestId String
+  userId          String
+  createdAt       DateTime @default(now())
+
+  legendRequest LegendRequest @relation(fields: [legendRequestId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([legendRequestId, userId])
+  @@index([legendRequestId])
+  @@index([userId])
+}
+
 enum Sender {
   USER
   LEGEND
@@ -103,4 +143,11 @@ enum Plan {
   FREE
   PRO
   PREMIUM
+}
+
+enum LegendRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
 }
