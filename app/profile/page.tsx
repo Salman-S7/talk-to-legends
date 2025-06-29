@@ -9,9 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import ManageSubscriptionButton from '@/components/pricing/ManageSubscriptionButton';
-import UpgradeButton from '@/components/pricing/UpgradeButton';
-import { User, Mail, Calendar, MapPin, Edit2, Save, X, MessageCircle, Clock, Star, Crown, Zap } from 'lucide-react';
+import { User, Mail, Calendar, MapPin, Edit2, Save, X, MessageCircle, Clock, Star, Crown, Zap, Gift, Sparkles } from 'lucide-react';
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -123,7 +121,7 @@ export default function ProfilePage() {
       case 'PREMIUM':
         return <Crown className="h-6 w-6 text-purple-600 dark:text-purple-400" />;
       default:
-        return <Star className="h-6 w-6 text-green-600 dark:text-green-400" />;
+        return <Gift className="h-6 w-6 text-green-600 dark:text-green-400" />;
     }
   };
 
@@ -135,6 +133,17 @@ export default function ProfilePage() {
         return 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300';
       default:
         return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+    }
+  };
+
+  const getPlanName = (plan: string) => {
+    switch (plan) {
+      case 'PRO':
+        return 'Pro';
+      case 'PREMIUM':
+        return 'Premium';
+      default:
+        return 'Free Forever';
     }
   };
 
@@ -334,47 +343,36 @@ export default function ProfilePage() {
 
             {/* Stats Sidebar */}
             <div className="space-y-6">
-              {/* Subscription Info */}
+              {/* Plan Info */}
               <Card className="p-6 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                 <h3 className="text-lg font-semibold text-black dark:text-white mb-4">
-                  Subscription
+                  Your Plan
                 </h3>
                 <div className="text-center">
                   <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
                     {getPlanIcon(userData.plan)}
                   </div>
                   <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mb-2 ${getPlanColor(userData.plan)}`}>
-                    {userData.plan} Plan
+                    {getPlanName(userData.plan)}
                   </div>
                   <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
-                    {userData.plan === 'FREE' && 'Limited conversations and features'}
-                    {userData.plan === 'PRO' && 'Unlimited conversations with voice generation'}
-                    {userData.plan === 'PREMIUM' && 'Everything in Pro plus custom legends and API access'}
+                    {userData.plan === 'FREE' && 'Enjoy unlimited access to all current features!'}
+                    {userData.plan === 'PRO' && 'Enhanced experience with voice generation'}
+                    {userData.plan === 'PREMIUM' && 'Ultimate experience with all premium features'}
                   </p>
                   
-                  {userData.plan === 'FREE' ? (
-                    <div className="space-y-2">
-                      <UpgradeButton
-                        plan="PRO"
-                        size="sm"
-                        className="w-full bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        Upgrade to Pro
-                      </UpgradeButton>
-                      <UpgradeButton
-                        plan="PREMIUM"
-                        variant="outline"
-                        size="sm"
-                        className="w-full border-neutral-300 dark:border-neutral-600"
-                      >
-                        Go Premium
-                      </UpgradeButton>
+                  {userData.plan === 'FREE' && (
+                    <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                      <div className="flex items-center justify-center space-x-2 mb-2">
+                        <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <span className="text-green-700 dark:text-green-300 font-semibold text-sm">
+                          Free While We Build
+                        </span>
+                      </div>
+                      <p className="text-green-600 dark:text-green-400 text-xs">
+                        Enjoy unlimited access while we develop amazing new features!
+                      </p>
                     </div>
-                  ) : (
-                    <ManageSubscriptionButton
-                      size="sm"
-                      className="w-full border-neutral-300 dark:border-neutral-600"
-                    />
                   )}
                 </div>
               </Card>

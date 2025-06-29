@@ -2,57 +2,56 @@
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Check, Star, Zap, Crown, MessageCircle, ArrowRight } from 'lucide-react';
+import { Check, Star, Zap, Crown, MessageCircle, ArrowRight, Gift, Sparkles } from 'lucide-react';
 
 const plans = [
   {
-    name: 'Free',
+    name: 'Free Forever',
     price: '$0',
-    period: 'forever',
-    description: 'Perfect for getting started',
+    period: 'always',
+    description: 'Everything you need to get started',
     features: [
-      '2 conversations per day',
-      '20 messages per day',
-      'Access to 3 legends',
-      'Text-based chat only',
-      'Basic conversation history'
+      'Unlimited conversations',
+      'Unlimited messages',
+      'Access to all 25+ legends',
+      'Full conversation history',
+      'Secure & private'
     ],
-    buttonText: 'Get Started Free',
-    buttonVariant: 'outline' as const,
-    popular: false,
-    icon: MessageCircle
+    buttonText: 'Start Free Now',
+    buttonVariant: 'default' as const,
+    popular: true,
+    icon: Gift
   },
   {
     name: 'Pro',
     price: '$9.99',
     period: 'per month',
-    description: 'Unlimited conversations with voice',
+    description: 'Enhanced experience coming soon',
     features: [
-      'Unlimited conversations',
-      'Unlimited messages',
-      'Access to all 25+ legends',
-      'Voice generation included',
+      'Everything in Free',
+      'Voice generation',
       'Priority response time',
-      'Extended conversation history'
+      'Advanced analytics',
+      'Export conversations'
     ],
-    buttonText: 'Start Pro Trial',
-    buttonVariant: 'default' as const,
-    popular: true,
+    buttonText: 'Coming Soon',
+    buttonVariant: 'outline' as const,
+    popular: false,
     icon: Zap
   },
   {
     name: 'Premium',
     price: '$19.99',
     period: 'per month',
-    description: 'Advanced features for enthusiasts',
+    description: 'Ultimate experience for enthusiasts',
     features: [
       'Everything in Pro',
       'Custom legend requests',
-      'Advanced voice customization',
       'API access',
-      'Priority support'
+      'Priority support',
+      'Early access features'
     ],
-    buttonText: 'Go Premium',
+    buttonText: 'Coming Soon',
     buttonVariant: 'outline' as const,
     popular: false,
     icon: Crown
@@ -65,16 +64,16 @@ export default function PricingSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 mb-8">
-            <Star className="w-4 h-4 text-green-500 mr-2" />
+            <Gift className="w-4 h-4 text-green-500 mr-2" />
             <span className="text-sm font-medium text-green-700 dark:text-green-300">
-              Simple Pricing
+              Free While We Build
             </span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-black dark:text-white">
-            Choose Your Plan
+            Choose Your Experience
           </h2>
           <p className="text-xl text-neutral-600 dark:text-neutral-300 max-w-3xl mx-auto">
-            Start free and upgrade as you explore more conversations with history's greatest minds
+            Start your journey completely free. Premium features coming soon!
           </p>
         </div>
         
@@ -87,13 +86,25 @@ export default function PricingSection() {
                 className={`relative bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm rounded-2xl p-8 border transition-all duration-300 hover:scale-105 ${
                   plan.popular
                     ? 'border-green-500 dark:border-green-400 shadow-lg shadow-green-500/20'
+                    : index > 0
+                    ? 'border-purple-300 dark:border-purple-600 hover:border-purple-500 dark:hover:border-purple-400'
                     : 'border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-600'
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                      Most Popular
+                    <div className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
+                      <Star className="w-4 h-4 mr-1" />
+                      Available Now
+                    </div>
+                  </div>
+                )}
+
+                {index > 0 && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
+                      <Sparkles className="w-4 h-4 mr-1" />
+                      Coming Soon
                     </div>
                   </div>
                 )}
@@ -119,18 +130,24 @@ export default function PricingSection() {
                   ))}
                 </div>
 
-                <Link href="/legends">
+                {plan.popular ? (
+                  <Link href="/legends">
+                    <Button
+                      variant={plan.buttonVariant}
+                      className="w-full py-3 font-semibold rounded-lg transition-all duration-300 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/25"
+                    >
+                      {plan.buttonText}
+                    </Button>
+                  </Link>
+                ) : (
                   <Button
                     variant={plan.buttonVariant}
-                    className={`w-full py-3 font-semibold rounded-lg transition-all duration-300 ${
-                      plan.popular
-                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/25'
-                        : ''
-                    }`}
+                    className="w-full py-3 font-semibold rounded-lg transition-all duration-300 cursor-not-allowed opacity-75"
+                    disabled
                   >
                     {plan.buttonText}
                   </Button>
-                </Link>
+                )}
               </div>
             );
           })}
@@ -139,7 +156,7 @@ export default function PricingSection() {
         <div className="text-center">
           <Link href="/pricing">
             <Button variant="outline" className="px-8 py-3 border-green-300 dark:border-green-600 text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 font-semibold rounded-lg transition-all duration-300">
-              View Detailed Pricing
+              View Full Roadmap
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
