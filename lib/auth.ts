@@ -95,6 +95,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/login',
-    signUp: '/auth/signup',
+    // Remove the signUp property as it's not a valid NextAuth page option
   },
 };
