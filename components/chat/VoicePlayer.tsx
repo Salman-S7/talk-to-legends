@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Loader2, AlertCircle } from 'lucide-react';
+import { Volume2, VolumeX, Loader2, AlertCircle, Crown } from 'lucide-react';
+import Link from 'next/link';
 
 interface VoicePlayerProps {
   text: string;
@@ -23,6 +24,7 @@ export default function VoicePlayer({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isPremiumFeature, setIsPremiumFeature] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Clean up audio URL when component unmounts or text changes
@@ -45,6 +47,7 @@ export default function VoicePlayer({
     try {
       setIsLoading(true);
       setError(null);
+      setIsPremiumFeature(false);
 
       // Clean up previous audio
       if (audioUrl) {
@@ -65,6 +68,12 @@ export default function VoicePlayer({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        
+        if (response.status === 403) {
+          setIsPremiumFeature(true);
+          throw new Error('Voice generation requires Pro plan');
+        }
+        
         throw new Error(errorData.error || 'Failed to generate voice');
       }
 
@@ -145,6 +154,25 @@ export default function VoicePlayer({
     return null;
   }
 
+  // Show upgrade prompt for premium feature
+  if (isPremiumFeature) {
+    return (
+      <div className="flex items-center space-x-2">
+        <Link href="/pricing">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 text-xs"
+            title="Upgrade to Pro for voice generation"
+          >
+            <Crown className="h-3 w-3 mr-1" />
+            Voice (Pro)
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center space-x-2">
       <Button
@@ -167,7 +195,7 @@ export default function VoicePlayer({
         {isLoading ? 'Generating...' : isPlaying ? 'Stop' : 'Listen'}
       </Button>
       
-      {error && (
+      {error && !isPremiumFeature && (
         <span className="text-xs text-red-500 dark:text-red-400">
           Voice unavailable
         </span>
