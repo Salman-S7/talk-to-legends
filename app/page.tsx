@@ -105,6 +105,26 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Bolt.new Logo - Bottom Right */}
+          <div className="fixed bottom-8 right-8 z-50">
+            <a
+              href="https://bolt.new/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-12 h-12 bg-white dark:bg-neutral-800 rounded-full shadow-lg border border-neutral-200 dark:border-neutral-700 hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+              title="Built with Bolt.new"
+            >
+              <img
+                src="/bolt-logo.png"
+                alt="Bolt.new"
+                className="w-full h-full object-contain p-2 animate-spin-slow group-hover:animate-spin"
+                style={{
+                  animation: 'spin 8s linear infinite',
+                }}
+              />
+            </a>
+          </div>
         </section>
 
         {/* How It Works Section */}
@@ -464,6 +484,18 @@ export default function Home() {
         </section>
       </div>
       <Footer />
+
+      {/* Custom CSS for slow spin animation */}
+      <style jsx>{`
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </>
   );
 }
